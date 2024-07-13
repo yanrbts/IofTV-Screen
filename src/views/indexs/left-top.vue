@@ -4,19 +4,19 @@
             <div class="user_Overview_nums allnum">
                 <dv-digital-flop :config="config" style="width:100%;height:100%;" />
             </div>
-            <p>总设备数</p>
+            <p>总加密文件数</p>
         </li>
         <li class="user_Overview-item" style="color: #07f7a8">
             <div class="user_Overview_nums online">
                 <dv-digital-flop :config="onlineconfig" style="width:100%;height:100%;" />
             </div>
-            <p>在线数</p>
+            <p>用户在线数</p>
         </li>
         <li class="user_Overview-item" style="color: #e3b337">
             <div class="user_Overview_nums offline">
                 <dv-digital-flop :config="offlineconfig" style="width:100%;height:100%;" />
             </div>
-            <p>掉线数</p>
+            <p>累计用户数</p>
         </li>
         <li class="user_Overview-item" style="color: #f5023d">
             <div class="user_Overview_nums laramnum">
@@ -50,7 +50,7 @@ export default {
             },
             pageflag: true,
             config: {
-                number: 100, // 初始值，可以根据实际情况调整
+                number: [100], // 初始值，可以根据实际情况调整
                 content: '{nt}',
                 style: {
                     ...style,
@@ -121,12 +121,21 @@ export default {
             }, 3000); // Reconnect after 3 seconds
         },
         updateUserOverview(data) {
+            this.pageflag = true;
             this.userOverview = data;
-            this.$set(this.onlineconfig, 'number', data.onlineNum);
-            Vue.set(this.config, 'number', data.filetotal);
-            this.$set(this.offlineconfig, 'number', data.offlineNum);
+            this.onlineconfig = {
+                ...this.onlineconfig,
+                number: [data.today_user_count]
+            }
+            this.config = {
+                ...this.config,
+                number: [data.filetotal]
+            }
+            this.offlineconfig = {
+                ...this.offlineconfig,
+                number: [data.total_login_count]
+            }
             this.$set(this.laramnumconfig, 'number', data.alarmNum);
-            console.log("Updated user overview:", this.userOverview);
         }
     },
 };

@@ -6,226 +6,202 @@
  * @FilePath: \web-pc\src\pages\big-screen\view\indexs\left-center.vue
 -->
 <template>
-  <Echart id="leftCenter" :options="options" class="left_center_inner" v-if="pageflag" ref="charts" />
-  <Reacquire v-else @onclick="getData" style="line-height:200px">
-    重新获取
-  </Reacquire>
+    <Echart id="leftCenter" :options="options" class="left_center_inner" v-if="pageflag" ref="charts" />
+    <Reacquire v-else @onclick="getData" style="line-height:200px">
+        重新获取
+    </Reacquire>
 </template>
 
 <script>
-import { currentGET } from 'api/modules'
+import WebSocketService from 'api/ws';
+import * as d3 from 'd3-scale-chromatic';
 export default {
-  data() {
-    return {
-      options: {},
-      countUserNumData: {
-        lockNum: 0,
-        onlineNum: 0,
-        offlineNum: 0,
-        totalNum: 0
-      },
-      pageflag: true,
-      timer: null
-    };
-  },
-  created() {
-    this.getData()
-  },
-  mounted() {
-  },
-  beforeDestroy() {
-    this.clearData()
-
-  },
-  methods: {
-    clearData() {
-      if (this.timer) {
-        clearInterval(this.timer)
-        this.timer = null
-      }
+    data() {
+        return {
+            options: {},
+            filetotal: 0,
+            fileext: {},
+            pageflag: true,
+            timer: null
+        };
     },
-    getData() {
-      this.pageflag = true
-      // this.pageflag =false
-
-      currentGET('big1').then(res => {
-        //只打印一次
-        if (!this.timer) {
-          console.log("设备总览", res);
-        }
-        if (res.success) {
-          this.countUserNumData = res.data
-          this.$nextTick(() => {
-            this.init()
-          })
-
-        } else {
-          this.pageflag = false
-          this.$Message({
-            text: res.msg,
-            type: 'warning'
-          })
-        }
-      })
+    created() {
+        this.initWebSocket();
+        // this.getData()
     },
-    //轮询
-    switper() {
-      if (this.timer) {
-        return
-      }
-      let looper = (a) => {
-        this.getData()
-      };
-      this.timer = setInterval(looper, this.$store.state.setting.echartsAutoTime);
-      let myChart = this.$refs.charts.chart
-      myChart.on('mouseover', params => {
-        this.clearData()
-      });
-      myChart.on('mouseout', params => {
-        this.timer = setInterval(looper, this.$store.state.setting.echartsAutoTime);
-      });
+    mounted() {},
+    beforeDestroy() {
+        // this.clearData()
+        WebSocketService.closeWebSocket();
     },
-    init() {
-      let total = this.countUserNumData.totalNum;
-      let colors = ["#ECA444", "#33A1DB", "#56B557"];
-      let piedata = {
-        name: "用户总览",
-        type: "pie",
-        radius: ["42%", "65%"],
-        avoidLabelOverlap: false,
-        itemStyle: {
-          borderRadius: 4,
-          borderColor: "rgba(0,0,0,0)",
-          borderWidth: 2,
+    methods: {
+        initWebSocket() {
+            WebSocketService.initWebSocket();
+            WebSocketService.socket.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    console.log("WebSocket [LEFT-CENTER]:", data);
+                    this.updateOverview(data);
+                } catch (error) {
+                    console.error('Error parsing WebSocket message:', error);
+                }
+            };
+            WebSocketService.socket.onclose = () => {
+                console.log('WebSocket connection closed. Reconnecting...');
+                this.reconnectWebSocket();
+            };
+            WebSocketService.socket.onerror = (error) => {
+                console.error('WebSocket error:', error);
+            };
+        },
+        reconnectWebSocket() {
+            WebSocketService.closeWebSocket();
+            setTimeout(() => {
+                this.initWebSocket();
+            }, 3000); // Reconnect after 3 seconds
         },
 
-        color: colors,
-        data: [
-          // {
-          //   value: 0,
-          //   name: "告警",
-          //   label: {
-          //     shadowColor: colors[0],
-          //   },
-          // },
-          {
-            value: this.countUserNumData.lockNum,
-            name: "锁定",
-            label: {
-              shadowColor: colors[0],
-            },
-          },
-          {
-            value: this.countUserNumData.onlineNum,
-            name: "在线",
-            label: {
-              shadowColor: colors[2],
-            },
-          },
-          {
-            value: this.countUserNumData.offlineNum,
-            name: "离线",
-            label: {
-              shadowColor: colors[1],
-            },
-          },
+        updateOverview(data) {
+            this.pageflag = true;
+            this.filetotal = data.filetotal;
+            this.fileext = data.fileext;
+            this.$nextTick(() => {
+                this.init()
+            })
+        },
 
+        clearData() {
+            if (this.timer) {
+                clearInterval(this.timer)
+                this.timer = null
+            }
+        },
 
-        ],
-      };
-      this.options = {
-        title: {
-          // zlevel: 0,
-          text: ["{value|" + total + "}", "{name|总数}"].join("\n"),
-          top: "center",
-          left: "center",
-          textStyle: {
-            rich: {
-              value: {
-                color: "#ffffff",
-                fontSize: 24,
-                fontWeight: "bold",
-                lineHeight: 20,
-              },
-              name: {
-                color: "#ffffff",
-                lineHeight: 20,
-              },
-            },
-          },
-        },
-        tooltip: {
-          trigger: "item",
-          backgroundColor: "rgba(0,0,0,.6)",
-          borderColor: "rgba(147, 235, 248, .8)",
-          textStyle: {
-            color: "#FFF",
-          },
-        },
-        legend: {
-          show: false,
-          top: "5%",
-          left: "center",
-        },
-        series: [
-          //展示圆点
-          {
-            ...piedata,
-            tooltip: { show: true },
-            label: {
-              formatter: "   {b|{b}}   \n   {c|{c}个}   {per|{d}%}  ",
-              //   position: "outside",
-              rich: {
-                b: {
-                  color: "#fff",
-                  fontSize: 12,
-                  lineHeight: 26,
+        init() {
+            let total = this.filetotal;
+            function generateColor(value, maxValue) {
+                // 计算颜色深度，0到255之间
+                const intensity = Math.floor((value / maxValue) * 255);
+                return `rgb(${intensity}, ${intensity}, 255)`; // 生成蓝色调颜色
+            }
+
+            let maxValue = Math.max(...Object.values(this.fileext)); // 获取最大文件数量
+
+            let piedata = {
+                name: "文件比例总览",
+                type: "pie",
+                radius: ["42%", "65%"],
+                avoidLabelOverlap: false,
+                itemStyle: {
+                    borderRadius: 4,
+                    borderColor: "rgba(0,0,0,0)",
+                    borderWidth: 2,
                 },
-                c: {
-                  color: "#31ABE3",
-                  fontSize: 14,
+                color: Object.values(this.fileext).map(value => generateColor(value, maxValue)),
+                data: Object.keys(this.fileext).map((key, index) => ({
+                    value: this.fileext[key],
+                    name: key,
+                    label: {
+                        shadowColor: generateColor(this.fileext[key], maxValue), // 使用生成的颜色
+                    },
+                }))
+            };
+
+            this.options = {
+                title: {
+                    // zlevel: 0,
+                    text: ["{value|" + total + "}", "{name|总数}"].join("\n"),
+                    top: "center",
+                    left: "center",
+                    textStyle: {
+                        rich: {
+                            value: {
+                                color: "#ffffff",
+                                fontSize: 24,
+                                fontWeight: "bold",
+                                lineHeight: 20,
+                            },
+                            name: {
+                                color: "#ffffff",
+                                lineHeight: 20,
+                            },
+                        },
+                    },
                 },
-                per: {
-                  color: "#31ABE3",
-                  fontSize: 14,
+                tooltip: {
+                    trigger: "item",
+                    backgroundColor: "rgba(0,0,0,.6)",
+                    borderColor: "rgba(147, 235, 248, .8)",
+                    textStyle: {
+                        color: "#FFF",
+                    },
                 },
-              },
-            },
-            labelLine: {
-              length: 20, // 第一段线 长度
-              length2: 36, // 第二段线 长度
-              show: true,
-            
-            },
-              emphasis: {
-                show: true,
-              },
-          },
-          {
-            ...piedata,
-            tooltip: { show: true },
-            itemStyle: {},
-            label: {
-              backgroundColor: "inherit", //圆点颜色，auto：映射的系列色
-              height: 0,
-              width: 0,
-              lineHeight: 0,
-              borderRadius: 2.5,
-              shadowBlur: 8,
-              shadowColor: "auto",
-              padding: [2.5, -2.5, 2.5, -2.5],
-            },
-            labelLine: {
-              length: 20, // 第一段线 长度
-              length2: 36, // 第二段线 长度
-              show: false,
-            },
-          },
-        ],
-      };
+                legend: {
+                    show: false,
+                    top: "5%",
+                    left: "center",
+                },
+                series: [
+                    //展示圆点
+                    {
+                        ...piedata,
+                        tooltip: { show: true },
+                        label: {
+                            formatter: "   {b|{b}}   \n   {c|{c}个}   {per|{d}%}  ",
+                            //   position: "outside",
+                            rich: {
+                                b: {
+                                    color: "#fff",
+                                    fontSize: 12,
+                                    lineHeight: 26,
+                                },
+                                c: {
+                                    color: "#31ABE3",
+                                    fontSize: 14,
+                                },
+                                per: {
+                                    color: "#31ABE3",
+                                    fontSize: 14,
+                                },
+                            },
+                        },
+                        labelLine: {
+                            length: 20, // 第一段线 长度
+                            length2: 36, // 第二段线 长度
+                            show: true,
+
+                        },
+                        emphasis: {
+                            show: true,
+                        },
+                    },
+                    {
+                        ...piedata,
+                        tooltip: { show: true },
+                        itemStyle: {},
+                        label: {
+                            backgroundColor: "inherit", //圆点颜色，auto：映射的系列色
+                            height: 0,
+                            width: 0,
+                            lineHeight: 0,
+                            borderRadius: 2.5,
+                            shadowBlur: 8,
+                            shadowColor: "auto",
+                            padding: [2.5, -2.5, 2.5, -2.5],
+                        },
+                        labelLine: {
+                            length: 20, // 第一段线 长度
+                            length2: 36, // 第二段线 长度
+                            show: false,
+                        },
+                    },
+                ],
+            };
+        },
     },
-  },
 };
 </script>
+
 <style lang='scss' scoped>
+
 </style>
