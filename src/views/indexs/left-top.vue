@@ -88,6 +88,7 @@ export default {
             return msg || 0;
         },
     },
+    
     created() {
         this.initWebSocket();
     },
@@ -119,6 +120,18 @@ export default {
             setTimeout(() => {
                 this.initWebSocket();
             }, 3000); // Reconnect after 3 seconds
+        },
+        formatNumber(number) {
+            if (number >= 10000) {
+                return (number / 10000).toFixed(2); // 返回保留两位小数的数值
+            }
+            return number;
+        },
+        formatLabel(number, label) {
+            if (number >= 10000) {
+                return `${(number / 10000).toFixed(2)}w+ ${label}`;
+            }
+            return label;
         },
         updateUserOverview(data) {
             this.pageflag = true;
