@@ -27,72 +27,75 @@
                                 <span class="labels">设备ID：</span>
     
                                 <span class="contents zhuyao doudong wangguan">
-    
-                      {{ item.gatewayno }}</span
-    
-                    >
-    
-                  </div>
-    
-                  <div class="info">
-    
-                    <span class="labels">名称：</span>
+        
+                          {{ item.machine }}</span
+        
+                        >
+        
+                      </div>
+        
+                      <div class="info">
+        
+                        <span class="labels">时间：</span>
     
                                 <span class="contents " style="font-size: 12px">
-    
-                      {{ item.username }}</span
-    
-                    >
-    
-                  </div>
-    
-                </div>
-    
-    
-    
-                  <span
-    
-                    class="types doudong"
-    
-                    :class="{
-    
-                      typeRed: item.onlineState == 0,
-    
-                      typeGreen: item.onlineState == 1,
-    
-                    }"
-    
-                    >{{ item.onlineState == 1 ? "上线" : "下线" }}</span
-    
-                  >
-    
-    
-    
-                <div class="info addresswrap">
-    
-                  <span class="labels">地址：</span>
+        
+                          {{ item.logintime }}</span
+        
+                        >
+        
+                      </div>
+        
+                    </div>
+        
+        
+        
+                      <span
+        
+                        class="types doudong"
+        
+                        :class="{
+        
+                          typeRed: item.onlineState == 0,
+        
+                          typeGreen: item.onlineState == 1,
+        
+                        }"
+        
+                        >{{ item.onlineState == 1 ? "上线" : "下线" }}</span
+        
+                      >
+        
+        
+        
+                    <div class="info addresswrap">
+        
+                      <span class="labels">地址：</span>
     
                                 <span class="contents ciyao" style="font-size: 12px">
-    
-                    {{ addressHandle(item) }}</span
-    
-                  >
-    
-                </div>
-    
-              </div>
-    
-            </li>
-    
-          </ul>
-    
-        </component>
-    
-      </div>
-    
-    
-    
-      <Reacquire v-else @onclick="getData" style="line-height: 200px" />
+        
+                        {{ item.area }}</span
+        
+                      >
+
+                      <span class="labels">用户名：</span>
+                      <span class="contents" style="font-size:12px"> {{ item.username }}</span>
+        
+                    </div>
+        
+                  </div>
+        
+                </li>
+        
+              </ul>
+        
+            </component>
+        
+          </div>
+        
+        
+        
+          <Reacquire v-else @onclick="getData" style="line-height: 200px" />
 </template>
 
 <script>
@@ -132,7 +135,6 @@ export default {
     },
 
     mounted() {
-        // this.getData();
         this.initWebSocket();
     },
     methods: {
@@ -143,7 +145,7 @@ export default {
                     const data = JSON.parse(event.data);
                     this.updateOverview(data);
                 } catch (error) {
-                    console.error('Error parsing WebSocket message:', error);
+                    console.error('[LEFT-BOTTOM] Error parsing WebSocket message:', error);
                 }
             };
             WebSocketService.socket.onclose = () => {
@@ -179,32 +181,11 @@ export default {
                 }
             }
             return name;
-        },
-        getData() {
-            this.pageflag = true;
-            // this.pageflag =false
-            currentGET("big3", { limitNum: 20 }).then((res) => {
-                console.log("设备提醒", res);
-                if (res.success) {
-                    this.countUserNumData = res.data;
-                    this.list = res.data.list;
-                    let timer = setTimeout(() => {
-                        clearTimeout(timer);
-                        this.defaultOption.step =
-                            this.$store.state.setting.defaultOption.step;
-                    }, this.$store.state.setting.defaultOption.waitTime);
-                } else {
-                    this.pageflag = false;
-                    this.$Message({
-                        text: res.msg,
-                        type: "warning",
-                    });
-                }
-            });
-        },
+        }
     },
 };
 </script>
+
 <style lang='scss' scoped>
 .left_boottom_wrap {
     overflow: hidden;

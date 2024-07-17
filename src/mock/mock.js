@@ -79,7 +79,7 @@ function centermap(options) {
                 "dataList|30": [
                     {
                         name: "@city()",
-                        value: '@integer(1, 1000)'
+                        value: '@integer(1, 10)'
                     }
                 ],
                 regionCode: params.regionCode,//-代表中国
@@ -93,7 +93,7 @@ function centermap(options) {
                 "dataList|8": [
                     {
                         name: "@province()",
-                        value: '@integer(1, 1000)'
+                        value: '@integer(1, 10)'
                     }
                 ],
                 regionCode: 'china',

@@ -42,7 +42,7 @@
       </ItemWrap>
       <ItemWrap
         class="contetn_left-bottom contetn_lr-item"
-        title="报警排名(TOP8)"
+        title="设备排名(TOP8)"
         style="padding: 0 10px 16px 10px"
       >
         <RightCenter />

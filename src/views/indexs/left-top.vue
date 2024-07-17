@@ -101,7 +101,6 @@ export default {
             WebSocketService.socket.onmessage = (event) => {
                 try {
                     const data = JSON.parse(event.data);
-                    console.log("WebSocket data received:", data);
                     this.updateUserOverview(data);
                 } catch (error) {
                     console.error('Error parsing WebSocket message:', error);
