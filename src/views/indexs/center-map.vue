@@ -44,7 +44,6 @@ export default {
 
     mounted() {
         // console.log(xzqCode);
-        // this.getData("china");
         this.initWebSocket();
     },
     methods: {
@@ -81,18 +80,6 @@ export default {
             console.log("[CENTER-MAP] :", formattedData);
             this.getGeojson("china", formattedData);
             this.mapclick();
-        },
-        getData(code) {
-            currentGET("big8", { regionCode: code }).then((res) => {
-                console.log("设备分布", res);
-                if (res.success) {
-                    console.log("HTTP:", res.data.dataList);
-                    this.getGeojson(res.data.regionCode, res.data.dataList);
-                    this.mapclick();
-                } else {
-                    this.$Message.warning(res.msg);
-                }
-            });
         },
         /**
          * @description: 获取geojson
@@ -333,7 +320,7 @@ export default {
                 let xzqData = xzqCode[params.name];
                 if (xzqData) {
                     // this.getData(xzqData.adcode);
-                    this.initWebSocket();
+                    // this.initWebSocket();
                 } else {
                     this.message("暂无下级地市!");
                 }

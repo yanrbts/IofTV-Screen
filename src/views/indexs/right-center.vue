@@ -19,7 +19,7 @@ export default {
             gatewayno: '',
             config: {
                 showValue: true,
-                unit: "次",
+                unit: "台",
                 data: []
             },
 
@@ -41,7 +41,6 @@ export default {
             WebSocketService.socket.onmessage = (event) => {
                 try {
                     const data = JSON.parse(event.data);
-                    console.log('[RIGHT-CENTER] message:', data.device_list);
                     this.updateOverview(data);
                 } catch (error) {
                     console.error('[RIGHT-CENTER] Error parsing WebSocket message:', error);

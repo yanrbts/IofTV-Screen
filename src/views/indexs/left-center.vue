@@ -40,7 +40,6 @@ export default {
             WebSocketService.socket.onmessage = (event) => {
                 try {
                     const data = JSON.parse(event.data);
-                    console.log("[LEFT-CENTER]:", data);
                     this.updateOverview(data);
                 } catch (error) {
                     console.error('Error parsing WebSocket message:', error);
