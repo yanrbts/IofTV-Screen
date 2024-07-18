@@ -100,7 +100,6 @@
 
 <script>
 import WebSocketService from 'api/ws';
-import { currentGET } from "api";
 import vueSeamlessScroll from "vue-seamless-scroll"; // vue2引入方式
 import Kong from "../../components/kong.vue";
 export default {
@@ -115,8 +114,7 @@ export default {
                 singleHeight: 240,
                 limitMoveNum: 5,
                 step: 0,
-            },
-            userlist: []
+            }
         };
     },
     computed: {
@@ -140,27 +138,10 @@ export default {
     methods: {
         initWebSocket() {
             WebSocketService.initWebSocket();
-            WebSocketService.socket.onmessage = (event) => {
-                try {
-                    const data = JSON.parse(event.data);
-                    this.updateOverview(data);
-                } catch (error) {
-                    console.error('[LEFT-BOTTOM] Error parsing WebSocket message:', error);
-                }
-            };
-            WebSocketService.socket.onclose = () => {
-                console.log('WebSocket connection closed. Reconnecting...');
-                this.reconnectWebSocket();
-            };
-            WebSocketService.socket.onerror = (error) => {
-                console.error('WebSocket error:', error);
-            };
+            WebSocketService.addListener(this.handleWebSocketMessage);
         },
-        reconnectWebSocket() {
-            WebSocketService.closeWebSocket();
-            setTimeout(() => {
-                this.initWebSocket();
-            }, 3000); // Reconnect after 3 seconds
+        handleWebSocketMessage(data) {
+            this.updateOverview(data);
         },
         updateOverview(data) {
             this.pageflag = true;

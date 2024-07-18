@@ -43,27 +43,18 @@ export default {
     created() {},
 
     mounted() {
-        // console.log(xzqCode);
         this.initWebSocket();
+    },
+    beforeDestroy() {
+        WebSocketService.removeListener(this.handleWebSocketMessage);
     },
     methods: {
         initWebSocket() {
             WebSocketService.initWebSocket();
-            WebSocketService.socket.onmessage = (event) => {
-                try {
-                    const data = JSON.parse(event.data);
-                    this.updateOverview(data);
-                } catch (error) {
-                    console.error('[RIGHT-CENTER] Error parsing WebSocket message:', error);
-                }
-            };
-            WebSocketService.socket.onclose = () => {
-                console.log('WebSocket connection closed. Reconnecting...');
-                this.reconnectWebSocket();
-            };
-            WebSocketService.socket.onerror = (error) => {
-                console.error('WebSocket error:', error);
-            };
+            WebSocketService.addListener(this.handleWebSocketMessage);
+        },
+        handleWebSocketMessage(data) {
+            this.updateOverview(data);
         },
         reconnectWebSocket() {
             WebSocketService.closeWebSocket();
@@ -77,7 +68,6 @@ export default {
                 name: key,
                 value: data.area_list[key]
             }));
-            console.log("[CENTER-MAP] :", formattedData);
             this.getGeojson("china", formattedData);
             this.mapclick();
         },
@@ -123,7 +113,6 @@ export default {
             this.init(name, mydata, newData);
         },
         init(name, data, data2) {
-            console.log("INIT :", data2);
             let top = 45;
             let zoom = 1.05;
             let option = {

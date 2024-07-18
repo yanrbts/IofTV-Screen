@@ -22,7 +22,7 @@
             <div class="user_Overview_nums laramnum">
                 <dv-digital-flop :config="laramnumconfig" style="width:100%;height:100%;" />
             </div>
-            <p>告警次数</p>
+            <p>溯源信息总数</p>
         </li>
     </ul>
     <Reacquire v-else @click="reconnectWebSocket" line-height="200px">
@@ -88,37 +88,21 @@ export default {
             return msg || 0;
         },
     },
-    
+
     created() {
         this.initWebSocket();
     },
     beforeDestroy() {
-        WebSocketService.closeWebSocket();
+        // WebSocketService.closeWebSocket();
+        WebSocketService.removeListener(this.handleWebSocketMessage);
     },
     methods: {
         initWebSocket() {
             WebSocketService.initWebSocket();
-            WebSocketService.socket.onmessage = (event) => {
-                try {
-                    const data = JSON.parse(event.data);
-                    this.updateUserOverview(data);
-                } catch (error) {
-                    console.error('Error parsing WebSocket message:', error);
-                }
-            };
-            WebSocketService.socket.onclose = () => {
-                console.log('WebSocket connection closed. Reconnecting...');
-                this.reconnectWebSocket();
-            };
-            WebSocketService.socket.onerror = (error) => {
-                console.error('WebSocket error:', error);
-            };
+            WebSocketService.addListener(this.handleWebSocketMessage);
         },
-        reconnectWebSocket() {
-            WebSocketService.closeWebSocket();
-            setTimeout(() => {
-                this.initWebSocket();
-            }, 3000); // Reconnect after 3 seconds
+        handleWebSocketMessage(data) {
+            this.updateOverview(data);
         },
         formatNumber(number) {
             if (number >= 10000) {
@@ -132,9 +116,9 @@ export default {
             }
             return label;
         },
-        updateUserOverview(data) {
+        updateOverview(data) {
             this.pageflag = true;
-            this.userOverview = data;
+            // this.userOverview = data;
             this.onlineconfig = {
                 ...this.onlineconfig,
                 number: [data.today_user_count]
@@ -147,7 +131,11 @@ export default {
                 ...this.offlineconfig,
                 number: [data.total_login_count]
             }
-            this.$set(this.laramnumconfig, 'number', data.alarmNum);
+            this.laramnumconfig = {
+                ...this.laramnumconfig,
+                number: [data.total_trace_counts]
+            }
+            // this.$set(this.laramnumconfig, 'number', data.alarmNum);
         }
     },
 };

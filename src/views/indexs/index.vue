@@ -36,7 +36,7 @@
     <div class="contetn_right">
       <ItemWrap
         class="contetn_left-bottom contetn_lr-item"
-        title="报警次数"
+        title="申请/授权"
       >
         <RightTop />
       </ItemWrap>
@@ -49,7 +49,7 @@
       </ItemWrap>
       <ItemWrap
         class="contetn_left-bottom contetn_lr-item"
-        title="数据统计图 "
+        title="最新溯源信息(TOP20) "
       >
         <RightBottom />
       </ItemWrap>

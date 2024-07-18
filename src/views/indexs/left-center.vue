@@ -32,26 +32,16 @@ export default {
     mounted() {},
     beforeDestroy() {
         // this.clearData()
-        WebSocketService.closeWebSocket();
+        // WebSocketService.closeWebSocket();
+        WebSocketService.removeListener(this.handleWebSocketMessage);
     },
     methods: {
         initWebSocket() {
             WebSocketService.initWebSocket();
-            WebSocketService.socket.onmessage = (event) => {
-                try {
-                    const data = JSON.parse(event.data);
-                    this.updateOverview(data);
-                } catch (error) {
-                    console.error('Error parsing WebSocket message:', error);
-                }
-            };
-            WebSocketService.socket.onclose = () => {
-                console.log('WebSocket connection closed. Reconnecting...');
-                this.reconnectWebSocket();
-            };
-            WebSocketService.socket.onerror = (error) => {
-                console.error('WebSocket error:', error);
-            };
+            WebSocketService.addListener(this.handleWebSocketMessage);
+        },
+        handleWebSocketMessage(data) {
+            this.updateOverview(data);
         },
         reconnectWebSocket() {
             WebSocketService.closeWebSocket();
