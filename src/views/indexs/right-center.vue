@@ -51,7 +51,17 @@ export default {
                 ...this.config,
                 data: deviceList
             }
+            this.switper();
         },
+        switper() {
+            if (this.timer) {
+                return
+            }
+            let looper = (a) => {
+                // this.getData()
+            };
+            this.timer = setInterval(looper, this.$store.state.setting.echartsAutoTime);
+        }
     },
 };
 </script>

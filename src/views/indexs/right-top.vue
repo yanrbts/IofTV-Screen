@@ -7,7 +7,7 @@
 -->
 <template>
     <Echart id="rightTop" :options="option" class="right_top_inner" v-if="pageflag" ref="charts" />
-    <Reacquire v-else @onclick="getData" style="line-height: 200px">
+    <Reacquire v-else @onclick="initWebSocket" style="line-height: 200px">
         重新获取
     </Reacquire>
 </template>
@@ -171,7 +171,7 @@ export default {
                         type: "line",
                         smooth: true,
                         symbol: "none", //去除点
-                        name: "报警1次数",
+                        name: "申请次数",
                         color: "rgba(252,144,16,.7)",
                         areaStyle: {
                             //右，下，左，上
@@ -235,7 +235,7 @@ export default {
                         type: "line",
                         smooth: true,
                         symbol: "none", //去除点
-                        name: "报警2次数",
+                        name: "授权次数",
                         color: "rgba(9,202,243,.7)",
                         areaStyle: {
                             //右，下，左，上

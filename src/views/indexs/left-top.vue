@@ -2,25 +2,29 @@
     <ul class="user_Overview flex" v-if="pageflag">
         <li class="user_Overview-item" style="color: #00fdfa">
             <div class="user_Overview_nums allnum">
-                <dv-digital-flop :config="config" style="width:100%;height:100%;" />
+                <!-- <dv-digital-flop :config="config" style="width:100%;height:100%;" /> -->
+                <span class="formatted-number">{{ formattedNumber(this.config.number) }}</span>
             </div>
             <p>总加密文件数</p>
         </li>
         <li class="user_Overview-item" style="color: #07f7a8">
             <div class="user_Overview_nums online">
-                <dv-digital-flop :config="onlineconfig" style="width:100%;height:100%;" />
+                <!-- <dv-digital-flop :config="onlineconfig" style="width:100%;height:100%;" /> -->
+                <span class="formatted-number">{{ formattedNumber(this.onlineconfig.number) }}</span>
             </div>
             <p>用户在线数</p>
         </li>
         <li class="user_Overview-item" style="color: #e3b337">
             <div class="user_Overview_nums offline">
-                <dv-digital-flop :config="offlineconfig" style="width:100%;height:100%;" />
+                <!-- <dv-digital-flop :config="offlineconfig" style="width:100%;height:100%;" /> -->
+                <span class="formatted-number">{{ formattedNumber(this.offlineconfig.number) }}</span>
             </div>
             <p>累计用户数</p>
         </li>
         <li class="user_Overview-item" style="color: #f5023d">
             <div class="user_Overview_nums laramnum">
-                <dv-digital-flop :config="laramnumconfig" style="width:100%;height:100%;" />
+                <!-- <dv-digital-flop :config="laramnumconfig" style="width:100%;height:100%;" /> -->
+                <span class="formatted-number">{{ formattedNumber(this.laramnumconfig.number) }}</span>
             </div>
             <p>溯源信息总数</p>
         </li>
@@ -104,18 +108,14 @@ export default {
         handleWebSocketMessage(data) {
             this.updateOverview(data);
         },
-        formatNumber(number) {
+        formattedNumber(number) {
             if (number >= 10000) {
-                return (number / 10000).toFixed(2); // 返回保留两位小数的数值
-            }
-            return number;
+                const value = number / 10000; // 转换为万单位
+                return `${value.toFixed(2)}W`; // 格式化为保留两位小数的字符串
+            } 
+            return `${number}`
         },
-        formatLabel(number, label) {
-            if (number >= 10000) {
-                return `${(number / 10000).toFixed(2)}w+ ${label}`;
-            }
-            return label;
-        },
+
         updateOverview(data) {
             this.pageflag = true;
             // this.userOverview = data;
@@ -193,5 +193,15 @@ export default {
             }
         }
     }
+}
+
+.formatted-number {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 18px;
+    color: #07f7a8;
+    /* 根据需要调整其他样式 */
 }
 </style>
