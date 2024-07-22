@@ -1,15 +1,31 @@
+import axios from 'axios';
 class WebSocketService {
     constructor() {
       this.socket = null;
       this.data = {};
       this.listeners = [];
-      this.initWebSocket(); // Ensure WebSocket is initialized on service instantiation
+      this.websocketUrl = '';
+      // Load WebSocket URL from config file
+      this.loadConfig();
+      // this.initWebSocket(); // Ensure WebSocket is initialized on service instantiation
+    }
+
+    async loadConfig() {
+      try {
+        const response = await axios.get('/config.json');
+        this.websocketUrl = response.data.websocketUrl || 'ws://localhost:8765';
+        this.initWebSocket();
+      } catch (error) {
+        console.error('Failed to load configuration:', error);
+        this.websocketUrl = 'ws://localhost:8765';
+        this.initWebSocket();
+      }
     }
   
     initWebSocket() {
       if (!this.socket || this.socket.readyState === WebSocket.CLOSED) {
         console.log('Initializing WebSocket...');
-        this.socket = new WebSocket('ws://localhost:8765');
+        this.socket = new WebSocket(this.websocketUrl);
         this.socket.onopen = this.onOpen.bind(this);
         this.socket.onmessage = this.onMessage.bind(this);
         this.socket.onclose = this.onClose.bind(this);
@@ -23,7 +39,6 @@ class WebSocketService {
   
     onMessage(event) {
       try {
-        console.log('Raw data received:', event.data); // Log raw data
         this.data = JSON.parse(event.data);
         console.log('Received data:', this.data);
         this.listeners.forEach(callback => callback(this.data));
