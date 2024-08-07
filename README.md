@@ -266,6 +266,16 @@ sudo chmod -R 755 /var/www/myapp
 
 ```
 
+## OpenSSL 兼容问题处理
+```sh
+export NODE_OPTIONS=--openssl-legacy-provider
+```
+
+## 程序打包
+```sh
+npm run build
+```
+
 ##  大屏交流反馈（面条的群）
 
 ### 大屏QQ群
