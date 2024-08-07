@@ -224,6 +224,48 @@ isSouthChinaSea:false,//默认不显示南海，改为true可显示南海
 {{10.23123|montionFilter }}
 ```
 
+## nginx 部署
+
+```sh
+# 更新系统包
+sudo apt update
+
+# 安装 Nginx
+sudo apt install nginx -y
+
+# 创建 Nginx 配置文件
+sudo nano /etc/nginx/sites-available/myapp
+
+# 添加以下内容并保存
+server {
+    listen 80;
+    server_name your_domain_or_ip;
+    root /var/www/myapp;
+    index index.html index.htm;
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
+
+# 创建符号链接
+sudo ln -s /etc/nginx/sites-available/myapp /etc/nginx/sites-enabled/
+
+# 检查 Nginx 配置
+sudo nginx -t
+
+# 重启 Nginx
+sudo systemctl restart nginx
+
+# 创建目录并复制静态文件
+sudo mkdir -p /var/www/myapp
+sudo cp -r /path_to_your_built_vue_project/* /var/www/myapp/
+
+# 设置文件权限
+sudo chown -R www-data:www-data /var/www/myapp
+sudo chmod -R 755 /var/www/myapp
+
+```
+
 ##  大屏交流反馈（面条的群）
 
 ### 大屏QQ群
