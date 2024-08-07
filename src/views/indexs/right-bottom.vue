@@ -122,6 +122,10 @@ export default {
                 return '授权';
             } else if (action === 1) {
                 return '申请';
+            } else if (action === 3) {
+                return '拒绝';
+            } else if (action === 4) {
+                return '打开';
             } else {
                 return '未知';
             }
