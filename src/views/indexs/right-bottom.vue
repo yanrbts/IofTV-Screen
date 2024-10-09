@@ -24,7 +24,7 @@
                             </div>
                             <div class="info">
                                 <span class="labels">文件名：</span>
-                                <span class="contents warning doudong wangguan"> {{ item.filename }}</span>
+                                <span class="contents warning doudong wangguan"> {{ item.sourceFileName }}</span>
                             </div>
                         </div>
     
